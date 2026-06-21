@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact | Ever-Detail Mobile Detailing</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="promo"></div>
+<div id="nav"></div>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="section-label">Get In Touch</div>
+    <h1>Contact Us</h1>
+    <p>Call, text, email, or book online — we're here to help.</p>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<section style="padding:64px 24px;background:var(--black);">
+  <div class="section-inner">
+    <div class="contact-grid">
+      <div>
+        <div class="section-label">Reach Us</div>
+        <h2 class="section-title" style="margin-bottom:28px;">Let's Talk</h2>
+        <div id="contact-block"></div>
+      </div>
+      <div>
+        <div class="section-label">Hours of Operation</div>
+        <h2 class="section-title" style="margin-bottom:28px;">When We Work</h2>
+        <table class="hours-table" id="hours-table"></table>
+        <div style="margin-top:32px;">
+          <a href="packages.html#book" class="btn-primary">Book Online Now</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="disclaimer-box" id="disclaimer" style="margin-top:48px;"></div>
+  </div>
+</section>
+
+<!-- MAP EMBED PLACEHOLDER -->
+<section style="padding:0;background:var(--deep);">
+  <div style="width:100%;height:340px;background:var(--card);display:flex;align-items:center;justify-content:center;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+    <div style="text-align:center;">
+      <div style="font-size:36px;margin-bottom:12px;">📍</div>
+      <p style="color:var(--muted);font-size:15px;" id="map-address"></p>
+      <a id="map-link" href="#" target="_blank" style="color:var(--red2);font-size:14px;font-weight:600;text-decoration:none;margin-top:8px;display:inline-block;">Open in Google Maps →</a>
+    </div>
+  </div>
+</section>
+
+<div id="footer"></div>
+
+<script src="js/sitedata.js"></script>
+<script src="js/render.js"></script>
+<script>
+  document.getElementById('promo').innerHTML    = renderPromo();
+  document.getElementById('nav').innerHTML      = renderNav('contact.html');
+  document.getElementById('footer').innerHTML   = renderFooter();
+  document.getElementById('contact-block').innerHTML = renderContactBlock();
+  document.getElementById('hours-table').innerHTML   = renderHours();
+  document.getElementById('disclaimer').innerHTML    = `<strong style="color:var(--white);">⚠ Please Note:</strong> ${SITE.disclaimer}`;
+  document.getElementById('map-address').textContent = SITE.address;
+  document.getElementById('map-link').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(SITE.address)}`;
+</script>
+</body>
+</html>

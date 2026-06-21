@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ever-Detail Mobile Detailing | Calgary</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="promo"></div>
+<div id="nav"></div>
+
+<!-- HERO -->
+<section class="hero" id="hero" style="position:relative;height:90vh;min-height:560px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+  <div id="hero-bg" style="position:absolute;inset:0;background-size:cover;background-position:center;opacity:.25;"></div>
+  <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.3),rgba(0,0,0,.72));"></div>
+  <div style="position:relative;text-align:center;max-width:820px;padding:0 24px;">
+    <div id="hero-eyebrow" style="font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--red2);margin-bottom:16px;"></div>
+    <h1 id="hero-title" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,9vw,100px);line-height:.95;letter-spacing:.02em;margin-bottom:22px;"></h1>
+    <p id="hero-sub" style="font-size:18px;color:#ccc;font-weight:300;margin-bottom:38px;max-width:540px;margin-left:auto;margin-right:auto;"></p>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+      <a href="packages.html#book" class="btn-primary">Book Your Detail</a>
+      <a href="packages.html" class="btn-outline">View Packages</a>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="trust-item">⭐ 5-Star Google Reviews</div>
+  <div class="trust-item">🏆 6+ Years in Calgary</div>
+  <div class="trust-item">🚗 We Come to You</div>
+  <div class="trust-item">💳 Online Booking & Payment</div>
+</div>
+
+<!-- PHOTO STRIP -->
+<section style="padding:56px 24px;background:var(--deep);">
+  <div class="section-inner">
+    <div class="section-label">Our Work</div>
+    <h2 class="section-title">Before & After Results</h2>
+    <div class="photo-grid" id="photo-grid"></div>
+  </div>
+</section>
+
+<!-- PACKAGES PREVIEW -->
+<section style="padding:72px 24px;background:var(--black);">
+  <div class="section-inner">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">Our Packages</h2>
+    <p class="section-sub">Most affordable rates in Calgary. We come to you — fully equipped.</p>
+    <div class="packages-grid" id="pkg-grid"></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section style="padding:72px 24px;background:var(--deep);">
+  <div class="section-inner" style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;">
+    <div>
+      <div class="section-label">Who We Are</div>
+      <h2 class="section-title">Calgary's Detail Shop on Wheels</h2>
+      <p style="color:#aaa;font-size:16px;line-height:1.8;margin-bottom:18px;">
+        Ever-Detail is a mobile car detailing service operating across Calgary and surrounding areas. With over 6 years in the industry, we pride ourselves on the finest quality detailing and customer service — at your doorstep.
+      </p>
+      <p style="color:#aaa;font-size:16px;line-height:1.8;margin-bottom:28px;">
+        No job is too big or too small. Cars, SUVs, trucks, luxury vehicles, boats — we handle it all, fully equipped.
+      </p>
+      <a href="packages.html#book" class="btn-primary">Book Now</a>
+    </div>
+    <div class="stats-row" id="stats-row"></div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section style="padding:72px 24px;background:var(--black);">
+  <div class="section-inner">
+    <div class="section-label">Testimonials</div>
+    <h2 class="section-title">Real Client Reviews</h2>
+    <div class="reviews-grid" id="reviews-grid"></div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<section style="padding:64px 24px;background:var(--red);text-align:center;">
+  <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);letter-spacing:.03em;margin-bottom:12px;">Ready for a Cleaner Ride?</h2>
+  <p style="font-size:17px;opacity:.85;margin-bottom:30px;">Book online in minutes. We come to you.</p>
+  <a href="packages.html#book" style="background:#fff;color:var(--red);padding:15px 40px;border-radius:4px;text-decoration:none;font-weight:700;font-size:16px;letter-spacing:.04em;display:inline-block;">Book Your Appointment</a>
+</section>
+
+<div id="footer"></div>
+
+<script src="js/sitedata.js"></script>
+<script src="js/render.js"></script>
+<script>
+  document.getElementById('promo').innerHTML = renderPromo();
+  document.getElementById('nav').innerHTML   = renderNav('index.html');
+  document.getElementById('footer').innerHTML = renderFooter();
+
+  // Hero
+  const h = SITE.hero;
+  document.getElementById('hero-bg').style.backgroundImage = `url('${h.bgImage}')`;
+  document.getElementById('hero-eyebrow').textContent = h.eyebrow;
+  document.getElementById('hero-title').innerHTML = h.title;
+  document.getElementById('hero-sub').textContent = h.subtitle;
+
+  // Stats
+  document.getElementById('stats-row').innerHTML = SITE.stats.map(s => `
+    <div class="stat-box">
+      <div class="stat-num">${s.num}</div>
+      <div class="stat-label">${s.label}</div>
+    </div>`).join('');
+
+  // Packages
+  document.getElementById('pkg-grid').innerHTML = renderPackageCards();
+
+  // Reviews
+  document.getElementById('reviews-grid').innerHTML = SITE.reviews.map(r => `
+    <div class="review-card">
+      <div class="review-stars">${'★'.repeat(r.stars)}</div>
+      <p class="review-text">"${r.text}"</p>
+      <div class="review-author">${r.name}</div>
+      <div class="review-source">Google Review</div>
+    </div>`).join('');
+
+  // Photos
+  document.getElementById('photo-grid').innerHTML = SITE.photos.map(p => `
+    <div class="photo-item">
+      <img src="${p.url}" alt="${p.caption}" loading="lazy">
+      <div class="photo-caption">${p.caption}</div>
+    </div>`).join('');
+</script>
+</body>
+</html>

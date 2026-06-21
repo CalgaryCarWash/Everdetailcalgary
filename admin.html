@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ever-Detail Admin — Site Editor</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  :root {
+    --black:#0a0a0a; --deep:#111; --card:#181818; --red:#c0392b; --red2:#e74c3c;
+    --gold:#d4a942; --white:#f5f5f5; --muted:#888; --border:#2a2a2a; --green:#27ae60;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--deep); color:var(--white); font-family:'Inter',sans-serif; font-size:14px; }
+
+  /* LAYOUT */
+  .shell { display:flex; min-height:100vh; }
+  .sidebar {
+    width:240px; min-width:240px; background:var(--black); border-right:1px solid var(--border);
+    padding:24px 0; position:sticky; top:0; height:100vh; overflow-y:auto;
+  }
+  .sidebar-logo { padding:0 20px 24px; border-bottom:1px solid var(--border); margin-bottom:16px; }
+  .sidebar-logo .logo { font-size:13px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--red2); }
+  .sidebar-logo .sub { font-size:11px; color:var(--muted); margin-top:3px; }
+  .nav-item {
+    display:block; padding:10px 20px; color:var(--muted); text-decoration:none;
+    font-size:13px; font-weight:500; cursor:pointer; transition:color .15s, background .15s;
+    border:none; background:none; width:100%; text-align:left;
+  }
+  .nav-item:hover { color:var(--white); background:rgba(255,255,255,.04); }
+  .nav-item.active { color:var(--white); background:rgba(192,57,43,.15); border-left:3px solid var(--red); padding-left:17px; }
+  .nav-section { font-size:10px; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); padding:16px 20px 6px; }
+
+  /* MAIN */
+  .main { flex:1; padding:32px 40px; max-width:900px; }
+  .page { display:none; }
+  .page.active { display:block; }
+
+  h1 { font-size:22px; font-weight:700; margin-bottom:6px; }
+  .page-sub { color:var(--muted); font-size:14px; margin-bottom:32px; }
+
+  /* CARDS */
+  .card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:24px; margin-bottom:20px; }
+  .card-title { font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:16px; }
+
+  /* FORM ELEMENTS */
+  label { display:block; font-size:12px; font-weight:600; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-bottom:5px; }
+  input[type=text], input[type=email], input[type=tel], input[type=number], input[type=url], textarea, select {
+    width:100%; background:#0f0f0f; border:1px solid var(--border); border-radius:5px;
+    color:var(--white); padding:9px 12px; font-size:14px; font-family:'Inter',sans-serif;
+    transition:border-color .2s; margin-bottom:16px; resize:vertical;
+  }
+  input:focus, textarea:focus, select:focus { outline:none; border-color:var(--red); }
+  textarea { min-height:80px; }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+
+  /* BUTTONS */
+  .btn { padding:9px 20px; border-radius:5px; font-size:13px; font-weight:600; cursor:pointer; border:none; transition:background .2s, transform .2s; letter-spacing:.03em; }
+  .btn-red { background:var(--red); color:#fff; }
+  .btn-red:hover { background:var(--red2); }
+  .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--muted); }
+  .btn-ghost:hover { border-color:var(--white); color:var(--white); }
+  .btn-green { background:var(--green); color:#fff; }
+  .btn-danger { background:#7f1e1e; color:#fff; }
+  .btn-danger:hover { background:#a02020; }
+
+  /* SAVE BAR */
+  .save-bar {
+    position:fixed; bottom:0; left:240px; right:0;
+    background:var(--black); border-top:1px solid var(--border);
+    padding:14px 40px; display:flex; align-items:center; justify-content:space-between;
+    z-index:50;
+  }
+  .save-msg { font-size:13px; color:var(--muted); }
+  .save-msg.success { color:var(--green); }
+  .save-msg.error { color:var(--red2); }
+
+  /* PACKAGE EDITOR */
+  .pkg-editor { background:#0f0f0f; border:1px solid var(--border); border-radius:6px; padding:20px; margin-bottom:16px; }
+  .pkg-editor-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .pkg-editor-title { font-weight:600; font-size:15px; }
+  .items-list { list-style:none; }
+  .items-list li { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .items-list input { margin-bottom:0; flex:1; }
+  .item-del { background:none; border:none; color:var(--muted); cursor:pointer; font-size:16px; padding:0 4px; }
+  .item-del:hover { color:var(--red2); }
+  .add-item-btn { background:none; border:1px dashed var(--border); color:var(--muted); border-radius:4px; padding:6px 14px; font-size:12px; cursor:pointer; width:100%; margin-top:4px; }
+  .add-item-btn:hover { border-color:var(--white); color:var(--white); }
+
+  /* PHOTO EDITOR */
+  .photo-row { display:flex; gap:12px; align-items:center; margin-bottom:12px; background:#0f0f0f; border:1px solid var(--border); border-radius:6px; padding:12px; }
+  .photo-row img { width:70px; height:52px; object-fit:cover; border-radius:4px; background:var(--deep); flex-shrink:0; }
+  .photo-row input { margin-bottom:0; flex:1; }
+  .photo-row .caption-input { width:150px; flex-shrink:0; }
+
+  /* REVIEW EDITOR */
+  .review-row { background:#0f0f0f; border:1px solid var(--border); border-radius:6px; padding:16px; margin-bottom:12px; }
+
+  /* SERVICE EDITOR */
+  .svc-row { background:#0f0f0f; border:1px solid var(--border); border-radius:6px; padding:16px; margin-bottom:12px; }
+  .svc-row-header { display:flex; gap:12px; align-items:center; margin-bottom:10px; }
+
+  /* CODE EXPORT */
+  .code-box { background:#000; border:1px solid var(--border); border-radius:6px; padding:20px; font-family:monospace; font-size:12px; color:#88b; line-height:1.6; overflow-x:auto; white-space:pre-wrap; word-break:break-all; max-height:400px; overflow-y:auto; }
+  .copy-btn { margin-top:12px; }
+
+  .pb-24 { padding-bottom:80px; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo">Ever-Detail</div>
+      <div class="sub">Site Editor / CMS</div>
+    </div>
+    <div class="nav-section">Pages</div>
+    <button class="nav-item active" onclick="showPage('home')">🏠 Home</button>
+    <button class="nav-item" onclick="showPage('packages')">📦 Packages</button>
+    <button class="nav-item" onclick="showPage('services')">🔧 Services</button>
+    <button class="nav-item" onclick="showPage('contact')">📞 Contact</button>
+    <div class="nav-section">Media & Reviews</div>
+    <button class="nav-item" onclick="showPage('photos')">🖼 Photos</button>
+    <button class="nav-item" onclick="showPage('reviews')">⭐ Reviews</button>
+    <div class="nav-section">Settings</div>
+    <button class="nav-item" onclick="showPage('global')">⚙️ Global Settings</button>
+    <button class="nav-item" onclick="showPage('export')">💾 Export Code</button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main pb-24">
+
+    <!-- HOME PAGE -->
+    <div class="page active" id="page-home">
+      <h1>Home Page</h1>
+      <p class="page-sub">Edit your hero section and promo banner.</p>
+      <div class="card">
+        <div class="card-title">Promo Banner</div>
+        <label>Promo Text (HTML allowed)</label>
+        <input type="text" id="promoText">
+      </div>
+      <div class="card">
+        <div class="card-title">Hero Section</div>
+        <label>Eyebrow Text</label>
+        <input type="text" id="hero-eyebrow">
+        <label>Main Headline (use &lt;span&gt; for red text)</label>
+        <input type="text" id="hero-title">
+        <label>Subtitle</label>
+        <textarea id="hero-subtitle"></textarea>
+        <label>Background Image URL</label>
+        <input type="url" id="hero-bg">
+      </div>
+      <div class="card">
+        <div class="card-title">Stats (shown on home + about)</div>
+        <div id="stats-editor"></div>
+      </div>
+    </div>
+
+    <!-- PACKAGES PAGE -->
+    <div class="page" id="page-packages">
+      <h1>Packages</h1>
+      <p class="page-sub">Edit package names, prices, surcharges, and feature lists.</p>
+      <div id="packages-editor"></div>
+      <div class="card">
+        <div class="card-title">Disclaimer</div>
+        <textarea id="disclaimer"></textarea>
+      </div>
+      <div class="card">
+        <div class="card-title">Square Booking Link</div>
+        <label>Your Square Appointments URL</label>
+        <input type="url" id="squareLink" placeholder="https://squareup.com/appointments/book/...">
+        <p style="font-size:12px;color:var(--muted);">Go to Square → Appointments → Online Booking to get your link.</p>
+      </div>
+    </div>
+
+    <!-- SERVICES PAGE -->
+    <div class="page" id="page-services">
+      <h1>Services</h1>
+      <p class="page-sub">Edit the intro paragraph and service cards.</p>
+      <div class="card">
+        <div class="card-title">Intro Text</div>
+        <textarea id="services-intro" style="min-height:120px;"></textarea>
+      </div>
+      <div class="card">
+        <div class="card-title">Service Cards</div>
+        <div id="services-editor"></div>
+        <button class="add-item-btn" onclick="addService()" style="margin-top:8px;">+ Add Service</button>
+      </div>
+    </div>
+
+    <!-- CONTACT PAGE -->
+    <div class="page" id="page-contact">
+      <h1>Contact Info</h1>
+      <p class="page-sub">Update your phone, email, address, and hours.</p>
+      <div class="card">
+        <div class="card-title">Contact Details</div>
+        <div class="row">
+          <div><label>Phone</label><input type="tel" id="phone"></div>
+          <div><label>Email</label><input type="email" id="email"></div>
+        </div>
+        <label>Address</label>
+        <input type="text" id="address">
+      </div>
+      <div class="card">
+        <div class="card-title">Hours of Operation</div>
+        <div id="hours-editor"></div>
+      </div>
+    </div>
+
+    <!-- PHOTOS -->
+    <div class="page" id="page-photos">
+      <h1>Photos</h1>
+      <p class="page-sub">Add or replace photo URLs. Use Imgur, Google Photos, or any direct image link.</p>
+      <div class="card">
+        <div id="photos-editor"></div>
+        <button class="add-item-btn" onclick="addPhoto()">+ Add Photo</button>
+      </div>
+    </div>
+
+    <!-- REVIEWS -->
+    <div class="page" id="page-reviews">
+      <h1>Reviews</h1>
+      <p class="page-sub">Edit customer review cards.</p>
+      <div class="card">
+        <div id="reviews-editor"></div>
+        <button class="add-item-btn" onclick="addReview()">+ Add Review</button>
+      </div>
+    </div>
+
+    <!-- GLOBAL -->
+    <div class="page" id="page-global">
+      <h1>Global Settings</h1>
+      <p class="page-sub">These values are used across all pages.</p>
+      <div class="card">
+        <div class="card-title">Business Info</div>
+        <div class="row">
+          <div><label>Phone</label><input type="tel" id="g-phone"></div>
+          <div><label>Email</label><input type="email" id="g-email"></div>
+        </div>
+        <label>Address</label>
+        <input type="text" id="g-address">
+        <label>Square Booking URL</label>
+        <input type="url" id="g-square">
+      </div>
+    </div>
+
+    <!-- EXPORT -->
+    <div class="page" id="page-export">
+      <h1>Export Updated Code</h1>
+      <p class="page-sub">After saving your changes, copy the updated <code>sitedata.js</code> below and replace the file on your server.</p>
+      <div class="card">
+        <div class="card-title">sitedata.js — Copy & Replace</div>
+        <div class="code-box" id="code-output"></div>
+        <button class="btn btn-red copy-btn" onclick="copyCode()">📋 Copy to Clipboard</button>
+        <p style="color:var(--muted);font-size:12px;margin-top:10px;">Paste this over your existing <code>js/sitedata.js</code> file to update your live website.</p>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- SAVE BAR -->
+<div class="save-bar">
+  <span class="save-msg" id="save-msg">All changes saved in this session.</span>
+  <div style="display:flex;gap:10px;">
+    <button class="btn btn-ghost" onclick="resetToDefaults()">Reset Defaults</button>
+    <button class="btn btn-red" onclick="saveAll()">💾 Save Changes</button>
+  </div>
+</div>
+
+<script src="js/sitedata.js"></script>
+<script>
+// ── LOCAL COPY OF DATA ───────────────────────────────────
+let D = JSON.parse(JSON.stringify(SITE)); // deep clone
+
+// ── PAGE NAVIGATION ──────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (name === 'export') generateCode();
+}
+
+// ── POPULATE FORMS ───────────────────────────────────────
+function populate() {
+  // Home
+  document.getElementById('promoText').value    = D.promoText;
+  document.getElementById('hero-eyebrow').value = D.hero.eyebrow;
+  document.getElementById('hero-title').value   = D.hero.title;
+  document.getElementById('hero-subtitle').value = D.hero.subtitle;
+  document.getElementById('hero-bg').value      = D.hero.bgImage;
+
+  // Stats
+  const se = document.getElementById('stats-editor');
+  se.innerHTML = D.stats.map((s, i) => `
+    <div class="row" style="margin-bottom:0;">
+      <div><label>Stat #${i+1} Number</label><input type="text" id="stat-num-${i}" value="${s.num}"></div>
+      <div><label>Label</label><input type="text" id="stat-label-${i}" value="${s.label}"></div>
+    </div>`).join('');
+
+  // Global / Contact
+  ['phone','email','address'].forEach(f => {
+    const el = document.getElementById(f);
+    const gel = document.getElementById('g-' + f);
+    if (el) el.value = D[f] || '';
+    if (gel) gel.value = D[f] || '';
+  });
+  const gs = document.getElementById('g-square');
+  if (gs) gs.value = D.squareBookingLink;
+  const sq = document.getElementById('squareLink');
+  if (sq) sq.value = D.squareBookingLink;
+
+  // Disclaimer
+  const disc = document.getElementById('disclaimer');
+  if (disc) disc.value = D.disclaimer;
+
+  // Services intro
+  const si = document.getElementById('services-intro');
+  if (si) si.value = D.servicesIntro;
+
+  // Hours
+  renderHoursEditor();
+  renderPackagesEditor();
+  renderServicesEditor();
+  renderPhotosEditor();
+  renderReviewsEditor();
+}
+
+// ── HOURS ────────────────────────────────────────────────
+function renderHoursEditor() {
+  document.getElementById('hours-editor').innerHTML = D.hours.map((h, i) => `
+    <div class="row" style="margin-bottom:4px;">
+      <div><label>Day ${i+1}</label><input type="text" id="h-day-${i}" value="${h.day}"></div>
+      <div><label>Time</label><input type="text" id="h-time-${i}" value="${h.time}"></div>
+    </div>
+    <div style="margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+      <input type="checkbox" id="h-open-${i}" ${h.open ? 'checked' : ''} style="width:auto;margin:0;">
+      <label style="text-transform:none;letter-spacing:0;font-size:13px;margin:0;" for="h-open-${i}">Show as open</label>
+    </div>`).join('');
+}
+
+// ── PACKAGES ─────────────────────────────────────────────
+function renderPackagesEditor() {
+  document.getElementById('packages-editor').innerHTML = D.packages.map((pkg, pi) => `
+    <div class="pkg-editor">
+      <div class="pkg-editor-header">
+        <span class="pkg-editor-title">${pkg.emoji} ${pkg.name} Package</span>
+      </div>
+      <div class="row3">
+        <div><label>Name</label><input type="text" id="pkg-name-${pi}" value="${pkg.name}"></div>
+        <div><label>Emoji</label><input type="text" id="pkg-emoji-${pi}" value="${pkg.emoji}" style="width:80px;"></div>
+        <div><label>Base Price ($)</label><input type="number" id="pkg-price-${pi}" value="${pkg.price}"></div>
+      </div>
+      <div class="row">
+        <div><label>Surcharge 1</label><input type="text" id="pkg-s0-${pi}" value="${pkg.surcharges[0]||''}"></div>
+        <div><label>Surcharge 2</label><input type="text" id="pkg-s1-${pi}" value="${pkg.surcharges[1]||''}"></div>
+      </div>
+      <label>Badge (leave blank for none)</label>
+      <input type="text" id="pkg-tag-${pi}" value="${pkg.tag||''}">
+      ${pkg.sections.map((sec, si) => `
+        <div style="background:#0a0a0a;border:1px solid var(--border);border-radius:5px;padding:14px;margin-bottom:10px;">
+          <label>Section Label</label>
+          <input type="text" id="pkg-sec-label-${pi}-${si}" value="${sec.label}">
+          <label>Items</label>
+          <ul class="items-list" id="pkg-items-${pi}-${si}">
+            ${sec.items.map((item, ii) => `
+              <li>
+                <input type="text" id="pkg-item-${pi}-${si}-${ii}" value="${item}">
+                <button class="item-del" onclick="removeItem(${pi},${si},${ii})">✕</button>
+              </li>`).join('')}
+          </ul>
+          <button class="add-item-btn" onclick="addItem(${pi},${si})">+ Add Item</button>
+        </div>`).join('')}
+      <label>Note (optional)</label>
+      <input type="text" id="pkg-note-${pi}" value="${pkg.note||''}">
+    </div>`).join('');
+}
+
+function addItem(pi, si) {
+  collectPackages();
+  D.packages[pi].sections[si].items.push('New item');
+  renderPackagesEditor();
+}
+function removeItem(pi, si, ii) {
+  collectPackages();
+  D.packages[pi].sections[si].items.splice(ii, 1);
+  renderPackagesEditor();
+}
+
+// ── SERVICES ─────────────────────────────────────────────
+function renderServicesEditor() {
+  document.getElementById('services-editor').innerHTML = D.services.map((s, i) => `
+    <div class="svc-row">
+      <div class="svc-row-header">
+        <input type="text" id="svc-icon-${i}" value="${s.icon}" style="width:60px;text-align:center;margin:0;font-size:20px;">
+        <input type="text" id="svc-title-${i}" value="${s.title}" placeholder="Service name" style="flex:1;margin:0;">
+        <button class="btn btn-danger" onclick="removeService(${i})" style="padding:6px 12px;">Remove</button>
+      </div>
+      <label>Description</label>
+      <textarea id="svc-desc-${i}">${s.desc}</textarea>
+    </div>`).join('');
+}
+function addService() {
+  collectServices();
+  D.services.push({ icon: '🚗', title: 'New Service', desc: 'Description here.' });
+  renderServicesEditor();
+}
+function removeService(i) {
+  collectServices();
+  D.services.splice(i, 1);
+  renderServicesEditor();
+}
+
+// ── PHOTOS ───────────────────────────────────────────────
+function renderPhotosEditor() {
+  document.getElementById('photos-editor').innerHTML = D.photos.map((p, i) => `
+    <div class="photo-row">
+      <img id="photo-preview-${i}" src="${p.url}" onerror="this.style.display='none'" alt="">
+      <input type="url" id="photo-url-${i}" value="${p.url}" placeholder="https://..." oninput="updatePhotoPreview(${i})">
+      <input type="text" id="photo-cap-${i}" value="${p.caption}" placeholder="Caption" class="caption-input" style="margin:0;">
+      <button class="btn btn-danger" onclick="removePhoto(${i})" style="padding:6px 12px;">✕</button>
+    </div>`).join('');
+}
+function updatePhotoPreview(i) {
+  const img = document.getElementById(`photo-preview-${i}`);
+  img.src = document.getElementById(`photo-url-${i}`).value;
+  img.style.display = '';
+}
+function addPhoto() {
+  collectPhotos();
+  D.photos.push({ url: '', caption: 'New Photo' });
+  renderPhotosEditor();
+}
+function removePhoto(i) {
+  collectPhotos();
+  D.photos.splice(i, 1);
+  renderPhotosEditor();
+}
+
+// ── REVIEWS ──────────────────────────────────────────────
+function renderReviewsEditor() {
+  document.getElementById('reviews-editor').innerHTML = D.reviews.map((r, i) => `
+    <div class="review-row">
+      <div class="row">
+        <div><label>Name</label><input type="text" id="rev-name-${i}" value="${r.name}"></div>
+        <div>
+          <label>Stars</label>
+          <select id="rev-stars-${i}" style="margin-bottom:16px;">
+            ${[5,4,3,2,1].map(n => `<option value="${n}" ${r.stars===n?'selected':''}>${n} ★</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <label>Review Text</label>
+      <textarea id="rev-text-${i}">${r.text}</textarea>
+      <button class="btn btn-danger" onclick="removeReview(${i})" style="padding:6px 12px;">Remove</button>
+    </div>`).join('');
+}
+function addReview() {
+  collectReviews();
+  D.reviews.push({ name: 'Customer Name', stars: 5, text: 'Great service!' });
+  renderReviewsEditor();
+}
+function removeReview(i) {
+  collectReviews();
+  D.reviews.splice(i, 1);
+  renderReviewsEditor();
+}
+
+// ── COLLECTORS ───────────────────────────────────────────
+function collectAll() {
+  D.promoText         = document.getElementById('promoText').value;
+  D.hero.eyebrow      = document.getElementById('hero-eyebrow').value;
+  D.hero.title        = document.getElementById('hero-title').value;
+  D.hero.subtitle     = document.getElementById('hero-subtitle').value;
+  D.hero.bgImage      = document.getElementById('hero-bg').value;
+  D.stats.forEach((s, i) => {
+    s.num   = document.getElementById(`stat-num-${i}`).value;
+    s.label = document.getElementById(`stat-label-${i}`).value;
+  });
+  D.phone   = document.getElementById('phone')?.value   || D.phone;
+  D.email   = document.getElementById('email')?.value   || D.email;
+  D.address = document.getElementById('address')?.value || D.address;
+  D.squareBookingLink = document.getElementById('squareLink')?.value || D.squareBookingLink;
+  D.disclaimer    = document.getElementById('disclaimer')?.value || D.disclaimer;
+  D.servicesIntro = document.getElementById('services-intro')?.value || D.servicesIntro;
+  D.hours.forEach((h, i) => {
+    h.day  = document.getElementById(`h-day-${i}`)?.value  || h.day;
+    h.time = document.getElementById(`h-time-${i}`)?.value || h.time;
+    h.open = document.getElementById(`h-open-${i}`)?.checked ?? h.open;
+  });
+  collectPackages();
+  collectServices();
+  collectPhotos();
+  collectReviews();
+}
+function collectPackages() {
+  D.packages.forEach((pkg, pi) => {
+    pkg.name  = document.getElementById(`pkg-name-${pi}`)?.value  || pkg.name;
+    pkg.emoji = document.getElementById(`pkg-emoji-${pi}`)?.value || pkg.emoji;
+    pkg.price = parseInt(document.getElementById(`pkg-price-${pi}`)?.value) || pkg.price;
+    pkg.tag   = document.getElementById(`pkg-tag-${pi}`)?.value || null;
+    pkg.note  = document.getElementById(`pkg-note-${pi}`)?.value || null;
+    pkg.surcharges = [
+      document.getElementById(`pkg-s0-${pi}`)?.value,
+      document.getElementById(`pkg-s1-${pi}`)?.value,
+    ].filter(Boolean);
+    pkg.sections.forEach((sec, si) => {
+      sec.label = document.getElementById(`pkg-sec-label-${pi}-${si}`)?.value || sec.label;
+      sec.items = sec.items.map((_, ii) =>
+        document.getElementById(`pkg-item-${pi}-${si}-${ii}`)?.value || ''
+      ).filter(Boolean);
+    });
+  });
+}
+function collectServices() {
+  D.services.forEach((s, i) => {
+    s.icon  = document.getElementById(`svc-icon-${i}`)?.value  || s.icon;
+    s.title = document.getElementById(`svc-title-${i}`)?.value || s.title;
+    s.desc  = document.getElementById(`svc-desc-${i}`)?.value  || s.desc;
+  });
+}
+function collectPhotos() {
+  D.photos.forEach((p, i) => {
+    p.url     = document.getElementById(`photo-url-${i}`)?.value     || p.url;
+    p.caption = document.getElementById(`photo-cap-${i}`)?.value || p.caption;
+  });
+}
+function collectReviews() {
+  D.reviews.forEach((r, i) => {
+    r.name  = document.getElementById(`rev-name-${i}`)?.value  || r.name;
+    r.stars = parseInt(document.getElementById(`rev-stars-${i}`)?.value) || r.stars;
+    r.text  = document.getElementById(`rev-text-${i}`)?.value  || r.text;
+  });
+}
+
+// ── SAVE ─────────────────────────────────────────────────
+function saveAll() {
+  collectAll();
+  const msg = document.getElementById('save-msg');
+  msg.textContent = '✅ Saved! Go to Export tab to get updated code.';
+  msg.className = 'save-msg success';
+  setTimeout(() => { msg.textContent = 'All changes saved in this session.'; msg.className = 'save-msg'; }, 4000);
+}
+
+// ── EXPORT ───────────────────────────────────────────────
+function generateCode() {
+  collectAll();
+  const code = `// ============================================================
+//  EVER-DETAIL — SITE CONTENT (Edit anything here!)
+//  Updated: ${new Date().toLocaleString()}
+// ============================================================
+
+const SITE = ${JSON.stringify(D, null, 2)};`;
+  document.getElementById('code-output').textContent = code;
+}
+function copyCode() {
+  const text = document.getElementById('code-output').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.currentTarget;
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => btn.textContent = '📋 Copy to Clipboard', 2000);
+  });
+}
+
+function resetToDefaults() {
+  if (confirm('Reset all changes to the original defaults?')) {
+    D = JSON.parse(JSON.stringify(SITE));
+    populate();
+  }
+}
+
+// ── INIT ─────────────────────────────────────────────────
+populate();
+</script>
+</body>
+</html>

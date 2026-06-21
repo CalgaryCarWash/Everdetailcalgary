@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Packages | Ever-Detail Mobile Detailing</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="promo"></div>
+<div id="nav"></div>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="section-label">Pricing</div>
+    <h1>Detailing Packages</h1>
+    <p>Select the package that's right for your vehicle. SUV, truck, and minivan surcharges apply.</p>
+  </div>
+</div>
+
+<!-- PACKAGES -->
+<section style="padding:64px 24px;background:var(--black);">
+  <div class="section-inner">
+    <div class="packages-grid" id="pkg-grid"></div>
+
+    <!-- DISCLAIMER -->
+    <div class="disclaimer-box" id="disclaimer"></div>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section id="book" style="padding:64px 24px;background:var(--deep);">
+  <div class="section-inner" style="text-align:center;">
+    <div class="section-label">Online Booking</div>
+    <h2 class="section-title">Book & Pay Online</h2>
+    <p class="section-sub" style="margin:0 auto 0;">Powered by Square — pick your package, choose a time, pay securely.</p>
+
+    <div class="book-box">
+      <p>
+        Click below to open our booking page. Choose your package, select a date and time, and pay securely online.
+        We'll confirm your appointment via text or call.
+      </p>
+      <!--
+        ┌──────────────────────────────────────────────────────────┐
+        │  TO CONNECT SQUARE:                                      │
+        │  1. Go to squareup.com/ca → Appointments → Online Book  │
+        │  2. Copy your booking page link                          │
+        │  3. Replace the href below with your link                │
+        └──────────────────────────────────────────────────────────┘
+      -->
+      <a id="square-link" href="#" target="_blank" class="btn-primary" style="font-size:16px;padding:15px 40px;">
+        📅 Book Your Appointment
+      </a>
+      <p class="book-note">Secure payment via Square · Visa, Mastercard, Debit accepted</p>
+      <p class="book-note" id="phone-note" style="margin-top:6px;"></p>
+    </div>
+  </div>
+</section>
+
+<div id="footer"></div>
+
+<script src="js/sitedata.js"></script>
+<script src="js/render.js"></script>
+<script>
+  document.getElementById('promo').innerHTML   = renderPromo();
+  document.getElementById('nav').innerHTML     = renderNav('packages.html');
+  document.getElementById('footer').innerHTML  = renderFooter();
+  document.getElementById('pkg-grid').innerHTML = renderPackageCards();
+  document.getElementById('disclaimer').innerHTML = `<strong style="color:var(--white);">⚠ Please Note:</strong> ${SITE.disclaimer}`;
+  document.getElementById('square-link').href  = SITE.squareBookingLink;
+  document.getElementById('phone-note').innerHTML = `Prefer to call or text? <strong style="color:var(--white);">${SITE.phone}</strong>`;
+</script>
+</body>
+</html>

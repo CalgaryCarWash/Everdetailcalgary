@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Services | Ever-Detail Mobile Detailing</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="promo"></div>
+<div id="nav"></div>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="section-label">What We Do</div>
+    <h1>Our Services</h1>
+    <p id="services-intro"></p>
+  </div>
+</div>
+
+<!-- SERVICES GRID -->
+<section style="padding:64px 24px;background:var(--black);">
+  <div class="section-inner">
+    <div class="services-grid" id="svc-grid"></div>
+  </div>
+</section>
+
+<!-- PHOTO STRIP -->
+<section style="padding:64px 24px;background:var(--deep);">
+  <div class="section-inner">
+    <div class="section-label">Our Work</div>
+    <h2 class="section-title">Results That Speak</h2>
+    <div class="photo-grid" id="photo-grid"></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="padding:64px 24px;background:var(--black);text-align:center;">
+  <div class="section-label">Ready?</div>
+  <h2 class="section-title">Book a Service Today</h2>
+  <p style="color:var(--muted);margin-bottom:28px;" id="svc-cta-phone"></p>
+  <a href="packages.html#book" class="btn-primary" style="font-size:16px;padding:15px 36px;">Book Online Now</a>
+</section>
+
+<div id="footer"></div>
+
+<script src="js/sitedata.js"></script>
+<script src="js/render.js"></script>
+<script>
+  document.getElementById('promo').innerHTML   = renderPromo();
+  document.getElementById('nav').innerHTML     = renderNav('services.html');
+  document.getElementById('footer').innerHTML  = renderFooter();
+
+  document.getElementById('services-intro').textContent = SITE.servicesIntro;
+  document.getElementById('svc-cta-phone').innerHTML = `Call or text us at <strong style="color:var(--white);">${SITE.phone}</strong> or book online below.`;
+
+  document.getElementById('svc-grid').innerHTML = SITE.services.map(s => `
+    <div class="svc-card">
+      <div class="svc-icon">${s.icon}</div>
+      <div class="svc-title">${s.title}</div>
+      <p class="svc-desc">${s.desc}</p>
+    </div>`).join('');
+
+  document.getElementById('photo-grid').innerHTML = SITE.photos.map(p => `
+    <div class="photo-item">
+      <img src="${p.url}" alt="${p.caption}" loading="lazy">
+      <div class="photo-caption">${p.caption}</div>
+    </div>`).join('');
+</script>
+</body>
+</html>
